@@ -27,7 +27,14 @@ func close(client *mongo.Client, ctx context.Context, cancel context.CancelFunc)
 	}()
 }
 
-func query()
+func query(client *mongo.Client, ctx context.Context, dataBase string, col string, query string,
+	field interface{}) (result *mongo.Cursor, err error) {
+	collection := client.Database(dataBase).Collection(col)
+
+	result, err = collection.Find(ctx, query, options.Find().SetProjection(field))
+
+	return
+}
 
 func ping(client *mongo.Client, ctx context.Context) error {
 	if err := client.Ping(ctx, readpref.Primary()); err != nil {
