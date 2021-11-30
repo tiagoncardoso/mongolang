@@ -17,4 +17,5 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/text v0.3.6 // indirect
 	golang.org/x/tools v0.1.7 // indirect
+	gopkg.in/gookit/color.v1 v1.1.6 // indirect
 )

@@ -25,7 +25,7 @@ type cadastroGaveta struct {
 	TipoProfissional string             `json:"tipoProfissional"`
 }
 
-func GetRegistration() string {
+func GetRegistration() json.RawMessage {
 	cg := &cadastroGaveta{
 		Cpf: 00011122233,
 	}
@@ -36,5 +36,5 @@ func GetRegistration() string {
 		log.Println(err)
 	}
 
-	return string(out)
+	return out
 }

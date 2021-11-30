@@ -1,58 +1,96 @@
 package main
 
 import (
+	mondrv "ccovdata/ccovdb"
+	valdrv "ccovdata/driver"
 	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"time"
+	"gopkg.in/gookit/color.v1"
+	"log"
 )
 
-func connect(uri string)(*mongo.Client, context.Context, context.CancelFunc, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 30 * time.Second)
+var collection *mongo.Collection
+var ctx = context.TODO()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+func connect(uri string) {
+	clientOptions := options.Client().ApplyURI(uri)
+	client, err := mongo.Connect(ctx, clientOptions)
 
-	return client, ctx, cancel, err
-}
-
-func close(client *mongo.Client, ctx context.Context, cancel context.CancelFunc) {
-	defer cancel()
-
-	defer func() {
-		if err := client.Disconnect(ctx); err != nil {
-			panic(err)
-		}
-	}()
-}
-
-func query(client *mongo.Client, ctx context.Context, dataBase string, col string, query string,
-	field interface{}) (result *mongo.Cursor, err error) {
-	collection := client.Database(dataBase).Collection(col)
-
-	result, err = collection.Find(ctx, query, options.Find().SetProjection(field))
-
-	return
-}
-
-func ping(client *mongo.Client, ctx context.Context) error {
-	if err := client.Ping(ctx, readpref.Primary()); err != nil {
-		return err
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		fmt.Print('d')
 	}
 
-	fmt.Println("Conexão estabelecida")
-	return nil
+	collection = client.Database("ccov").Collection("DriverRegister")
+}
+
+
+func getAll() ([]*mondrv.Driver, error) {
+	filter := bson.D{{}}
+
+	return filterDriver(filter)
+}
+
+func filterDriver(filter interface{}) ([]*mondrv.Driver, error) {
+	var drivers []*mondrv.Driver
+
+	cur, err := collection.Find(ctx, filter)
+	if err != nil {
+		return drivers, err
+	}
+
+	for cur.Next(ctx) {
+		var d mondrv.Driver
+		err := cur.Decode(&d)
+
+		if err != nil {
+			fmt.Println(err)
+			return drivers, err
+		}
+
+		drivers = append(drivers, &d)
+	}
+
+	if cur.Err(); err != nil {
+		return drivers, err
+	}
+
+	cur.Close(ctx)
+
+	if len(drivers) == 0 {
+		return drivers, mongo.ErrNoDocuments
+	}
+
+	return drivers, nil
+}
+
+func printDrivers(drivers []*mondrv.Driver) {
+	for i, v := range drivers {
+		if v.BlockedDriver {
+			color.Red.Printf("%d: %s\n", i+1, valdrv.BuildValidaDriver(v))
+		} else {
+			color.Green.Printf("%d: %s\n", i+1, valdrv.BuildValidaDriver(v))
+		}
+	}
 }
 
 func main()  {
-	client, ctx, cancel, err := connect("mongodb://localhost:27017")
+	connect("mongodb://localhost:27017")
+
+	drivers, err := getAll()
 
 	if err != nil {
-		panic(err)
+		if err == mongo.ErrNoDocuments {
+			fmt.Print("Nenhum registro")
+		}
+	} else {
+		printDrivers(drivers)
 	}
 
-	defer close(client, ctx, cancel)
-
-	ping(client, ctx)
+	//ping(client, ctx)
 }

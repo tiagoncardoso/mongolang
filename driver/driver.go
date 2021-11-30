@@ -1,31 +1,32 @@
-package main
+package driver
 
 import (
+	mondrv "ccovdata/ccovdb"
 	"ccovdata/driver/registration"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
+	"time"
 )
 
-type personModel struct {
-	Name string				`json:"nome"`
-	Cpf int64				`json:"cpf"`
-	Criacao string			`json:"criacao"`
-	CadastroGaveta string	`json:"cadastroGaveta"`
-	ImgCnh string			`json:"img_cng"`
-	ImgRg string			`json:"img_rg"`
-	ImgEndereco string		`json:"img_endereco"`
-	Uf string				`json:"uf"`
+type driverModel struct {
+	Name 							string				`json:"nome"`
+	Cpf 							string				`json:"cpf"`
+	Criacao 						time.Time			`json:"criacao"`
+	CadastroGaveta 					json.RawMessage		`json:"cadastroGaveta"`
+	ImgCnh 							string				`json:"img_cng"`
+	ImgRg 							string				`json:"img_rg"`
+	ImgEndereco 					string				`json:"img_endereco"`
+	Uf 								string				`json:"uf"`
 }
 
-func main() {
-	cg := fmt.Sprintf(registration.GetRegistration())
+func BuildValidaDriver(driver *mondrv.Driver) string {
+	cg := registration.GetRegistration()
 
-	p := &personModel{
-		Name:           "Teste",
-		Cpf:            99999999999,
-		Criacao:        "2021-11-26 10:38",
+	p := &driverModel{
+		Name:           driver.Name,
+		Cpf:            driver.Document,
+		Criacao:        driver.CreationTime,
 		CadastroGaveta: cg,
 		ImgCnh:         "file_cnh.jpg",
 		ImgRg:          "file_rg.png",
@@ -40,5 +41,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println(string(out))
+	return string(out)
 }
