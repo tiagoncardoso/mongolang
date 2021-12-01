@@ -1,11 +1,6 @@
-package registration
+package locker_register
 
-import (
-	"encoding/json"
-	"log"
-)
-
-type cadastroGaveta struct {
+type LockerRegister struct {
 	Cpf int64                           `json:"cpf"`
 	Nome string                         `json:"nome"`
 	Rg string                           `json:"rg"`
@@ -25,16 +20,20 @@ type cadastroGaveta struct {
 	TipoProfissional string             `json:"tipoProfissional"`
 }
 
-func GetRegistration() json.RawMessage {
-	cg := &cadastroGaveta{
-		Cpf: 00011122233,
-	}
-
-	out, err := json.Marshal(cg)
-
-	if err != nil {
-		log.Println(err)
-	}
-
-	return out
+func NewLockerRegister() *LockerRegister {
+	return &LockerRegister{}
 }
+
+//func GetRegistration() json.RawMessage {
+//	cg := &cadastroGaveta{
+//		Cpf: 00011122233,
+//	}
+//
+//	out, err := json.Marshal(cg)
+//
+//	if err != nil {
+//		log.Println(err)
+//	}
+//
+//	return out
+//}

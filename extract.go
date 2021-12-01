@@ -1,8 +1,7 @@
 package main
 
 import (
-	mondrv "ccovdata/ccovdb"
-	valdrv "ccovdata/driver"
+	mondrv "ccovdata/entity"
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
@@ -72,9 +71,9 @@ func filterDriver(filter interface{}) ([]*mondrv.Driver, error) {
 func printDrivers(drivers []*mondrv.Driver) {
 	for i, v := range drivers {
 		if v.BlockedDriver {
-			color.Red.Printf("%d: %s\n", i+1, valdrv.BuildValidaDriver(v))
+			color.Red.Printf("%d: %s\n", i+1, mondrv.BuildValidaDriver(v))
 		} else {
-			color.Green.Printf("%d: %s\n", i+1, valdrv.BuildValidaDriver(v))
+			color.Green.Printf("%d: %s\n", i+1, mondrv.BuildValidaDriver(v))
 		}
 	}
 }

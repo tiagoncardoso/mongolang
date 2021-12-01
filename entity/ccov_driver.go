@@ -1,4 +1,4 @@
-package ccovdb
+package entity
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -22,7 +22,7 @@ type reference struct {
 	Name								string				`bson:"Name"`
 }
 
-type Driver struct {
+type ccovDriver struct {
 	ID									primitive.ObjectID	`bson:"_id"`
 	Delete								bool				`bson:"Delete"`
 	UserId								primitive.ObjectID	`bson:"UserId"`
@@ -68,17 +68,21 @@ type Driver struct {
 	CommercialLandline					string				`bson:"CommercialLandline"`
 	CommercialContact					string				`bson:"CommercialContact"`
 	ReferenceLandline					string				`bson:"ReferenceLandline"`
-	ReferenceContact					string				`bson:"ReferenceContact"`
-	DeviceRegisters						[]device			`bson:"DeviceRegisters"`
-	Comments							string				`bson:"Comments"`
+	ReferenceContact					string        		`bson:"ReferenceContact"`
+	DeviceRegisters						[]device   			`bson:"DeviceRegisters"`
+	Comments							string        		`bson:"Comments"`
 	UserEmployee						string				`bson:"UserEmployee"`
 	ProductValue						float64				`bson:"ProductValue"`
 	ProductId							primitive.ObjectID	`bson:"ProductId"`
 	Product								string				`bson:"Product"`
 	RegisterSpecial						bool				`bson:"RegisterSpecial"`
 	Score								int8				`bson:"Score"`
-	Attachments							[]string			`bson:"Attachments"`
-	References							[]reference			`bson:"References"`
-	Documents							[]document			`bson:"Documents"`
-	BlockedDriver						bool				`bson:"BlockedDriver"`
+	Attachments							[]string   			`bson:"Attachments"`
+	References							[]reference 		`bson:"References"`
+	Documents							[]document   		`bson:"Documents"`
+	BlockedDriver						bool         		`bson:"BlockedDriver"`
+}
+
+func NewCcovDriver() *ccovDriver {
+	return &ccovDriver{}
 }
