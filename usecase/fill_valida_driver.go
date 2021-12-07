@@ -1,6 +1,8 @@
 package usecase
 
-import "ccovdata/entity"
+import (
+	"ccovdata/domain/entity"
+)
 
 type FillValidaDriver struct {
 	Repository entity.CcovRepository
@@ -9,3 +11,5 @@ type FillValidaDriver struct {
 func NewFillValidaDriver(repository entity.CcovRepository) *FillValidaDriver {
 	return &FillValidaDriver{Repository: repository}
 }
+
+func (dr *)
