@@ -1,15 +1,23 @@
 package valida
 
-import "time"
-
 type VehicleOwner struct {
-	UfRgId         int32     `json:"uf_rg_id"`
-	Cpf            int64     `json:"cpf"`
-	Cnpj           int64     `json:"cnpj"`
-	Rg             string    `json:"rg"`
-	Fone           int64     `json:"fone"`
-	Nome           string    `json:"nome"`
-	Criacao        time.Time `json:"criacao"`
-	NomeMae        string    `json:"nome_mae"`
-	DataNascimento time.Time `json:"data_nascimento"`
+	Id             int     `json:"id"`
+	Nome           string  `json:"nome"`
+	NomeMae        string  `json:"nomeMae"`
+	DataNascimento string  `json:"dataNascimento"`
+	Cpf            string  `json:"cpf"`
+	Cnpj           string  `json:"cnpj"`
+	Rg             string  `json:"rg"`
+	UfRg           string  `json:"ufRg"`
+	Fone           string  `json:"fone"`
+	Complemento    *string `json:"complemento"`
+}
+
+func NewVehicleOwner() *VehicleOwner {
+	nvo := &VehicleOwner{
+		Id:          0,
+		Complemento: nil,
+	}
+
+	return nvo
 }
