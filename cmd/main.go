@@ -40,7 +40,7 @@ func main() {
 		companyData := getCompanyCnpjById(v.Company, db, ctx)
 		v.CompanyExtra = companyData
 
-		if i > 10 {
+		if i > 100 {
 			break
 		}
 	}
@@ -52,17 +52,23 @@ func main() {
 }
 
 func getCompanyCnpjById(companyName string, db *mongo.Client, ctx context.Context) *ccov.Company {
+	defaultCompany := ccov.NewCompany()
+	defaultCompany.CompanyIsVerttice()
+
 	companyRepo := repository.NewCompanyRepository(db, ctx)
-	companyData, _ := companyRepo.GetCompanyExternal(companyName, ctx)
+	companyData, err := companyRepo.GetCompanyExternal(companyName, ctx)
+	if err != nil {
+		return defaultCompany
+	}
 
 	return companyData
 }
 
 func printDrivers(drivers []*ccov.DriverRegisterExternal) {
 	for i, v := range drivers {
-		fmt.Printf("%d: %s\n", i+1, v)
+		fmt.Printf("%d: %s\n", i+1, v.CompanyExtra)
 
-		if i > 10 {
+		if i > 100 {
 			break
 		}
 	}
