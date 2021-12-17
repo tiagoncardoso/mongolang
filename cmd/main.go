@@ -5,10 +5,13 @@ import (
 	"ccovdata/domain/repository"
 	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 )
+
+var limit = 100
 
 func connect(dsn string) (error, *mongo.Client, context.Context) {
 	var ctx context.Context
@@ -37,10 +40,13 @@ func main() {
 	}
 
 	for i, v := range ccovRegisterExternal {
-		companyData := getCompanyCnpjById(v.Company, db, ctx)
-		v.CompanyExtra = companyData
+		companyExtraData := getCompanyCnpjById(v.Company, db, ctx)
+		registerExtraData := getCompleteRegisterById(v.Id, db, ctx)
 
-		if i > 100 {
+		v.CompanyExtra = companyExtraData
+		v.RegisterExtra = registerExtraData
+
+		if i > limit {
 			break
 		}
 	}
@@ -64,11 +70,24 @@ func getCompanyCnpjById(companyName string, db *mongo.Client, ctx context.Contex
 	return companyData
 }
 
+func getCompleteRegisterById(id primitive.ObjectID, db *mongo.Client, ctx context.Context) *ccov.DriverRegister {
+	defaultRegister := ccov.NewDriverRegister()
+
+	registerRepo := repository.NewDriverRegisterRepository(db, ctx)
+	registerData, err := registerRepo.GetDriverRegister(id, ctx)
+
+	if err != nil {
+		return defaultRegister
+	}
+
+	return registerData
+}
+
 func printDrivers(drivers []*ccov.DriverRegisterExternal) {
 	for i, v := range drivers {
-		fmt.Printf("%d: %s\n", i+1, v.CompanyExtra)
+		fmt.Printf("%d: %s\n", i+1, v.RegisterExtra.DriverProfile)
 
-		if i > 100 {
+		if i > limit {
 			break
 		}
 	}
