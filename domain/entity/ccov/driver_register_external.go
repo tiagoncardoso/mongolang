@@ -14,6 +14,9 @@ type DriverRegisterExternal struct {
 	Status          int
 	UserId          string
 	ExternalUserId  string
+	Company         string
+	CompanyID       string
+	CompanyExtra    *Company
 }
 
 func NewDriverRegisterExternal() *DriverRegisterExternal {
