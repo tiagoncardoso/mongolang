@@ -4,21 +4,30 @@ import (
 	"ccovdata/domain/entity/ccov"
 	"ccovdata/domain/repository"
 	"context"
+	"database/sql"
 	"fmt"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"os"
 )
 
 var limit = 100
 
 func connect(dsn string) (error, *mongo.Client, context.Context) {
 	var ctx context.Context
+
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
 	clientOptions := options.Client().ApplyURI(dsn)
 	client, _ := mongo.Connect(ctx, clientOptions)
 
-	err := client.Ping(ctx, nil)
+	err = client.Ping(ctx, nil)
 	if err != nil {
 		return err, nil, nil
 	}
@@ -50,11 +59,27 @@ func main() {
 			break
 		}
 	}
+
+	var dbPortal *sql.DB
+Ref1:
+https: //www.loginradius.com/blog/async/environment-variables-in-golang/
+Ref2:
+https: //github.com/tiagoncardoso/imersaofc5/blob/main/golang/cmd/main.go
+	dbPortal, err = myslqPortalConnection()
 	//
 	//usecase := parse_register.NewParseRegister(repo)
 	//
 	//usecase.Execute()
 	printDrivers(ccovRegisterExternal)
+}
+
+func myslqPortalConnection() (*sql.DB, error) {
+	db, err := sql.Open("mysql", os.Getenv("DB_PORTAL_USER")+":"+os.Getenv("DB_PORTAL_PWD")+"@tcp("+os.Getenv("DB_PORTAL_HOST")+":3306)/"+os.Getenv("DB_PORTAL_NAME"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db, err
 }
 
 func getCompanyCnpjById(companyName string, db *mongo.Client, ctx context.Context) *ccov.Company {
