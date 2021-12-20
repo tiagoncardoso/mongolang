@@ -6,6 +6,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,7 +15,7 @@ import (
 	"os"
 )
 
-var limit = 100
+var limit = 1000
 
 func connect(dsn string) (error, *mongo.Client, context.Context) {
 	var ctx context.Context
@@ -48,24 +49,26 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var dbPortal *sql.DB
+	dbPortal, err = myslqPortalConnection()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	for i, v := range ccovRegisterExternal {
 		companyExtraData := getCompanyCnpjById(v.Company, db, ctx)
 		registerExtraData := getCompleteRegisterById(v.Id, db, ctx)
+		CompanyId := getCompanyId(companyExtraData.Document, dbPortal)
 
 		v.CompanyExtra = companyExtraData
 		v.RegisterExtra = registerExtraData
+		v.CompanyPortalId = CompanyId
 
 		if i > limit {
 			break
 		}
 	}
 
-	var dbPortal *sql.DB
-Ref1:
-https: //www.loginradius.com/blog/async/environment-variables-in-golang/
-Ref2:
-https: //github.com/tiagoncardoso/imersaofc5/blob/main/golang/cmd/main.go
-	dbPortal, err = myslqPortalConnection()
 	//
 	//usecase := parse_register.NewParseRegister(repo)
 	//
@@ -74,12 +77,12 @@ https: //github.com/tiagoncardoso/imersaofc5/blob/main/golang/cmd/main.go
 }
 
 func myslqPortalConnection() (*sql.DB, error) {
-	db, err := sql.Open("mysql", os.Getenv("DB_PORTAL_USER")+":"+os.Getenv("DB_PORTAL_PWD")+"@tcp("+os.Getenv("DB_PORTAL_HOST")+":3306)/"+os.Getenv("DB_PORTAL_NAME"))
+	db, err := sql.Open("mysql", os.Getenv("DB_PORTAL_USER")+":"+os.Getenv("DB_PORTAL_PWD")+"@tcp("+os.Getenv("DB_PORTAL_HOST")+":"+os.Getenv("DB_PORTAL_PORT")+")/"+os.Getenv("DB_PORTAL_NAME"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return db, err
+	return db, nil
 }
 
 func getCompanyCnpjById(companyName string, db *mongo.Client, ctx context.Context) *ccov.Company {
@@ -108,9 +111,20 @@ func getCompleteRegisterById(id primitive.ObjectID, db *mongo.Client, ctx contex
 	return registerData
 }
 
+func getCompanyId(cnpj string, db *sql.DB) int {
+	portalRepo := repository.NewPortalDatabaseRepository(db)
+
+	companyId, err := portalRepo.FindCompanyId(cnpj)
+	if err != nil {
+		companyId = 38
+	}
+
+	return companyId
+}
+
 func printDrivers(drivers []*ccov.DriverRegisterExternal) {
 	for i, v := range drivers {
-		fmt.Printf("%d: %s\n", i+1, v.RegisterExtra.DriverProfile)
+		fmt.Printf("%d: %d\n", i+1, v.CompanyPortalId)
 
 		if i > limit {
 			break

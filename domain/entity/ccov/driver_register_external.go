@@ -20,6 +20,7 @@ type DriverRegisterExternal struct {
 	Company         string             `bson:"Company"`
 	CompanyID       string             `bson:"CompanyID"`
 	CompanyExtra    *Company           `bson:"CompanyExtra"`
+	CompanyPortalId int                `bson:"CompanyPortalId"`
 	RegisterExtra   *DriverRegister    `bson:"RegisterExtra"`
 }
 
