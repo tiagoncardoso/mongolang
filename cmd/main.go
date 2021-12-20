@@ -11,11 +11,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"gopkg.in/gookit/color.v1"
 	"log"
 	"os"
 )
 
-var limit = 1000
+var limit = 5000
 
 func connect(dsn string) (error, *mongo.Client, context.Context) {
 	var ctx context.Context
@@ -42,8 +43,12 @@ func main() {
 		fmt.Print("Não foi possível estabelecer a conexão com ccov via mongo db")
 	}
 
+	fmt.Println("Iniciando busca de cadastros Ccov.")
+
 	repo := repository.NewCcovRegisterRepository(db, ctx)
 	ccovRegisterExternal, err := repo.GetRegisterExternal("DriverRegisterExternal", ctx)
+
+	fmt.Printf("Números de cadastros encontrados: %d\n\n", len(ccovRegisterExternal))
 
 	if err != nil {
 		log.Fatal(err)
@@ -54,6 +59,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	plus := 0
 
 	for i, v := range ccovRegisterExternal {
 		companyExtraData := getCompanyCnpjById(v.Company, db, ctx)
@@ -64,16 +70,24 @@ func main() {
 		v.RegisterExtra = registerExtraData
 		v.CompanyPortalId = CompanyId
 
+		if v.IsPlus() {
+			color.Green.Printf("%d: \nPortal ID %d (%s) | %s - Plus: %t\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name, v.IsPlus())
+			plus += 1
+		}
+		color.White.Printf("%d: \nPortal ID %d (%s) | %s - Plus: %t\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name, v.IsPlus())
+
 		if i > limit {
 			break
 		}
 	}
 
+	fmt.Printf("Plus: %d\n", plus)
+
 	//
 	//usecase := parse_register.NewParseRegister(repo)
 	//
 	//usecase.Execute()
-	printDrivers(ccovRegisterExternal)
+	//printDrivers(ccovRegisterExternal)
 }
 
 func myslqPortalConnection() (*sql.DB, error) {
@@ -122,12 +136,12 @@ func getCompanyId(cnpj string, db *sql.DB) int {
 	return companyId
 }
 
-func printDrivers(drivers []*ccov.DriverRegisterExternal) {
-	for i, v := range drivers {
-		fmt.Printf("%d: %d\n", i+1, v.CompanyPortalId)
-
-		if i > limit {
-			break
-		}
-	}
-}
+//func printDrivers(drivers []*ccov.DriverRegisterExternal) {
+//	for i, v := range drivers {
+//		fmt.Printf("%d: %d (%s) | %s\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name)
+//
+//		if i > limit {
+//			break
+//		}
+//	}
+//}

@@ -6,6 +6,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/joho/godotenv v1.3.0
 	go.mongodb.org/mongo-driver v1.7.4
+	gopkg.in/gookit/color.v1 v1.1.6
 )
 
 require (

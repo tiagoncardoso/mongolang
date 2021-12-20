@@ -27,3 +27,10 @@ type DriverRegisterExternal struct {
 func NewDriverRegisterExternal() *DriverRegisterExternal {
 	return &DriverRegisterExternal{}
 }
+
+func (dr *DriverRegisterExternal) IsPlus() bool {
+	productTest := dr.Product == "Algodão" || dr.Product == "ALGODAO"
+	scoreTest := dr.RegisterExtra.Score > 10
+
+	return productTest && scoreTest
+}
