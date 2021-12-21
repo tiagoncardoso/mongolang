@@ -3,6 +3,7 @@ package main
 import (
 	"ccovdata/domain/entity/ccov"
 	"ccovdata/domain/repository"
+	"ccovdata/usecase/parse_register"
 	"context"
 	"database/sql"
 	"fmt"
@@ -59,8 +60,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	plus := 0
 
+	var dbValida *sql.DB
+	dbPortal, err = mysqlValidaConnection()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	plus := 0
 	for i, v := range ccovRegisterExternal {
 		companyExtraData := getCompanyCnpjById(v.Company, db, ctx)
 		registerExtraData := getCompleteRegisterById(v.Id, db, ctx)
@@ -70,11 +77,18 @@ func main() {
 		v.RegisterExtra = registerExtraData
 		v.CompanyPortalId = CompanyId
 
+		newRegisterId, err := saveRegisterInValida(v, dbValida)
+		if err != nil {
+			log.Fatal("Não foi possível persistir o novo cadastro.")
+		}
+
 		if v.IsPlus() {
 			color.Green.Printf("%d: \nPortal ID %d (%s) | %s - Plus: %t\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name, v.IsPlus())
+			color.Yellow.Printf("%d\n\n", newRegisterId)
 			plus += 1
 		}
 		color.White.Printf("%d: \nPortal ID %d (%s) | %s - Plus: %t\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name, v.IsPlus())
+		color.Yellow.Printf("%d\n\n", newRegisterId)
 
 		if i > limit {
 			break
@@ -93,7 +107,16 @@ func main() {
 func myslqPortalConnection() (*sql.DB, error) {
 	db, err := sql.Open("mysql", os.Getenv("DB_PORTAL_USER")+":"+os.Getenv("DB_PORTAL_PWD")+"@tcp("+os.Getenv("DB_PORTAL_HOST")+":"+os.Getenv("DB_PORTAL_PORT")+")/"+os.Getenv("DB_PORTAL_NAME"))
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
+	}
+
+	return db, nil
+}
+
+func mysqlValidaConnection() (*sql.DB, error) {
+	db, err := sql.Open("mysql", os.Getenv("DB_VALIDA_USER")+":"+os.Getenv("DB_VALIDA_PWD")+"@tcp("+os.Getenv("DB_VALIDA_HOST")+":"+os.Getenv("DB_VALIDA_PORT")+")/"+os.Getenv("DB_VALIDA_NAME"))
+	if err != nil {
+		return nil, err
 	}
 
 	return db, nil
@@ -136,12 +159,15 @@ func getCompanyId(cnpj string, db *sql.DB) int {
 	return companyId
 }
 
-//func printDrivers(drivers []*ccov.DriverRegisterExternal) {
-//	for i, v := range drivers {
-//		fmt.Printf("%d: %d (%s) | %s\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name)
-//
-//		if i > limit {
-//			break
-//		}
-//	}
-//}
+func saveRegisterInValida(register *ccov.DriverRegisterExternal, db *sql.DB) (int, error) {
+	validaRepo := repository.NewValidaDatabaseRepository(db)
+
+	usecase := parse_register.NewParseRegister(validaRepo, register)
+
+	driverRegisterId, err := usecase.SaveDriver()
+	if err != nil {
+		return 0, err
+	}
+
+	vehicles, _ := usecase.SaveVehicle()
+}

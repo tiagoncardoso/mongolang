@@ -16,7 +16,6 @@ func (pdr *PortalDatabaseRepository) FindCompanyId(cnpj string) (int, error) {
 	var id int
 
 	err := pdr.db.QueryRow(`SELECT id FROM empresa WHERE cnpj = ?`, cnpj).Scan(&id)
-
 	if err != nil {
 		return -1, err
 	}

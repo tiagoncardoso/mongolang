@@ -1,35 +1,152 @@
 package parse_register
 
 import (
-	"ccovdata/domain/factory"
-	"ccovdata/usecase/dto"
-	"fmt"
-	"strconv"
+	"ccovdata/domain/entity/ccov"
+	"ccovdata/domain/entity/valida"
+	"ccovdata/domain/entity/valida/locker_register"
+	"ccovdata/domain/repository"
+	"time"
 )
 
+var NOW = time.Now()
+
 type ParseRegister struct {
-	Repository factory.DriverRegisterExternalRepository
+	Repository *repository.ValidaDatabaseRepository
+	Register   *ccov.DriverRegisterExternal
 }
 
-func NewParseRegister(repository factory.DriverRegisterExternalRepository) *ParseRegister {
-	return &ParseRegister{Repository: repository}
-}
-
-func (pr *ParseRegister) ProcessCcovRegisterExternal(registerInput []*dto.RegisterDtoInput) {
-	var output = dto.RegisterDtoOutput{}
-	for i, v := range registerInput {
-		output = dto.RegisterDtoOutput{
-			ID:           "Item " + strconv.Itoa(i),
-			Status:       "certo",
-			ErrorMessage: "nada",
-		}
-
-		pr.PrintRegister(v)
-
-		fmt.Println(output)
+func NewParseRegister(repository *repository.ValidaDatabaseRepository, register *ccov.DriverRegisterExternal) *ParseRegister {
+	return &ParseRegister{
+		Repository: repository,
+		Register:   register,
 	}
 }
 
-func (pr *ParseRegister) PrintRegister(register *dto.RegisterDtoInput) {
-	fmt.Print("%s\n", register)
+func (pr *ParseRegister) SaveDriver() (int64, error) {
+	r := pr.Register
+	lockerRegister := pr.buildDriverLocker()
+
+	driver, err := valida.NewDriverRegister(
+		r.Driver.Name,
+		r.Driver.Document,
+		lockerRegister,
+		NOW,
+		r.Driver.State,
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	var did int64
+	did, err = pr.Repository.InsertDriver(driver)
+	if err != nil {
+		return 0, err
+	}
+
+	return did, nil
+}
+
+func (pr *ParseRegister) SaveVehicle() ([]int64, error) {
+	var vids []int64
+
+	var vm *valida.VehicleRegister = nil
+	var carr1 *valida.VehicleRegister = nil
+	var carr2 *valida.VehicleRegister = nil
+	var carr3 *valida.VehicleRegister = nil
+
+	vm, _ = pr.buildVehicle(0)
+	carr1, _ = pr.buildVehicle(1)
+	carr2, _ = pr.buildVehicle(2)
+	carr3, _ = pr.buildVehicle(3)
+
+	var vid int64
+	if vm != nil {
+		vid, _ = pr.Repository.InsertVehicle(vm)
+		vids = append(vids, vid)
+	}
+	if carr1 != nil {
+		vid, _ = pr.Repository.InsertVehicle(carr1)
+		vids = append(vids, vid)
+	}
+	if carr2 != nil {
+		vid, _ = pr.Repository.InsertVehicle(carr2)
+		vids = append(vids, vid)
+	}
+	if carr3 != nil {
+		vid, _ = pr.Repository.InsertVehicle(carr3)
+		vids = append(vids, vid)
+	}
+
+	return vids, nil
+}
+
+func (pr *ParseRegister) SaveTravel() (int, error) {
+
+}
+
+func (pr *ParseRegister) SaveRegister() (int, error) {
+
+}
+
+func (pr *ParseRegister) SaveResult() (int, error) {
+
+}
+
+func (pr *ParseRegister) buildDriverLocker() *locker_register.DriverLockerRegister {
+	reg := pr.Register.RegisterExtra
+	lr := locker_register.NewDriverLockerRegister()
+	lr.SetDriverCategory(reg.DriverProfile)
+	lr.SetPersonalData(
+		reg.Name,
+		reg.MotherName,
+		reg.DateOfBirthday.Format("YYYY-MM-DD"),
+	)
+	lr.SetDocumentsData(
+		reg.Document,
+		reg.Document3,
+		reg.IssueStateDocument3,
+		reg.Document2,
+		reg.IssueStateDocument2,
+		reg.DueDateDocument3.Format("YYYY-MM-DD"),
+		lr.SetCnhCategory(reg.CategoryDocument3),
+	)
+	lr.SetContactData(reg.Landline)
+
+	return lr
+}
+
+func (pr *ParseRegister) buildVehicle(id int) (*valida.VehicleRegister, error) {
+	vs := pr.Register.DeviceRegisters
+	if id >= (len(vs) - 1) {
+		return nil, nil
+	}
+	lockerRegister := pr.buildVehicleLocker(id)
+
+	veic, _ := valida.NewVehicleRegister(
+		vs[id].Plate,
+		vs[id].StatePlate,
+		lockerRegister,
+	)
+	veic.SetTipoVinculo(pr.Register.RegisterExtra.DriverProfile)
+
+	return veic, nil
+}
+
+func (pr *ParseRegister) buildVehicleLocker(idVeic int) *locker_register.VehicleLockerRegister {
+	reg := pr.Register.DeviceRegisters[idVeic]
+	lr := locker_register.NewVehicleLockerRegister()
+	lr.SetVehicleData(
+		reg.Plate,
+		reg.Document2,
+		reg.StatePlate,
+	)
+	vehicleType := "CAVALO_MECANICO"
+
+	if idVeic > 0 {
+		vehicleType = "CARRETA"
+	}
+	lr.SetVehicleType(vehicleType)
+
+	return lr
 }

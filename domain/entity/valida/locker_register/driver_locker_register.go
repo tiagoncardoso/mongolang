@@ -1,6 +1,9 @@
 package locker_register
 
-import "strconv"
+import (
+	"strconv"
+	"strings"
+)
 
 type DriverLockerRegister struct {
 	Cpf                 string                `json:"cpf"`
@@ -22,15 +25,48 @@ type DriverLockerRegister struct {
 	TipoProfissional    string                `json:"tipoProfissional"`
 }
 
-func NewLockerRegister() *DriverLockerRegister {
+func NewDriverLockerRegister() *DriverLockerRegister {
 	return &DriverLockerRegister{
 		CadastroFull: nil,
 		Email:        nil,
 	}
 }
 
+func (dlr *DriverLockerRegister) SetCnhCategory(category int) string {
+	switch category {
+	case 1:
+		return "AAC"
+	case 2:
+		return "A"
+	case 3:
+		return "B"
+	case 4:
+		return "C"
+	case 5:
+		return "D"
+	case 6:
+		return "E"
+	case 7:
+		return "AB"
+	case 8:
+		return "AC"
+	case 9:
+		return "AD"
+	case 10:
+		return "AE"
+	}
+
+	return "B"
+}
+
 func (dlr *DriverLockerRegister) SetDriverCategory(category string) {
-	dlr.TipoProfissional = category
+	if category == "RG" {
+		dlr.TipoProfissional = "ADMINISTRATIVO"
+	} else if category == "Terceiro" || category == "Autônomo" {
+		dlr.TipoProfissional = "AUTONOMO"
+	} else {
+		dlr.TipoProfissional = strings.ToUpper(category)
+	}
 }
 
 func (dlr *DriverLockerRegister) SetPersonalData(nome string, nomeMae string, dataNascimento string) {

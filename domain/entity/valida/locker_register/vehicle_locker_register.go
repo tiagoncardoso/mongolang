@@ -10,11 +10,6 @@ type VehicleLockerRegister struct {
 	TipoVinculoProfissional string  `json:"tipoVinculoProfissional"`
 }
 
-const (
-	CAVALO_MECANICO int = 2
-	CARRETA             = 1
-)
-
 func NewVehicleLockerRegister() *VehicleLockerRegister {
 	return &VehicleLockerRegister{}
 }
