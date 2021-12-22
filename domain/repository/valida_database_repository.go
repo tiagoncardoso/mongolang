@@ -104,6 +104,8 @@ func (vdr *ValidaDatabaseRepository) InsertTravel(tr *valida.TravelRegister) (in
 		return 0, err
 	}
 
+	carga, _ := json.Marshal(tr.TipoCarga)
+
 	var res sql.Result
 	res, err = stmt.Exec(
 		tr.OrigemPaisId,
@@ -112,9 +114,9 @@ func (vdr *ValidaDatabaseRepository) InsertTravel(tr *valida.TravelRegister) (in
 		tr.DestinoPaisId,
 		tr.DestinoUfId,
 		tr.DestinoCidadeId,
-		tr.TipoCarga,
+		carga,
 		tr.ValorCarga,
-		tr.Criacao,
+		tr.Criacao.Format("2006-01-02 15:04:05"),
 	)
 
 	if err != nil {

@@ -17,8 +17,7 @@ type TravelRegister struct {
 	Criacao          time.Time `json:"criacao"`
 }
 
-func NewTravelRegister() *TravelRegister {
-	now := time.Now()
+func NewTravelRegister(createdAt time.Time) *TravelRegister {
 	return &TravelRegister{
 		OrigemPaisId:    1,
 		OrigemUfId:      21,
@@ -26,7 +25,7 @@ func NewTravelRegister() *TravelRegister {
 		DestinoPaisId:   1,
 		DestinoUfId:     20,
 		DestinoCidadeId: 3829,
-		Criacao:         now,
+		Criacao:         createdAt,
 	}
 }
 
@@ -34,7 +33,7 @@ func (tr *TravelRegister) SetValorCarga(valor float64) {
 	tr.ValorCarga = valor
 }
 
-func (tr *TravelRegister) SetChargerType(chargerType string) []int {
+func (tr *TravelRegister) SetChargerType(chargerType string) {
 	var tipoCarga []int
 
 	switch chargerType {
@@ -52,5 +51,5 @@ func (tr *TravelRegister) SetChargerType(chargerType string) []int {
 	}
 	tipoCarga = append(tipoCarga, 162)
 
-	return tipoCarga
+	tr.TipoCarga = tipoCarga
 }

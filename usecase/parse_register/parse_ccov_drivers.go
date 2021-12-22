@@ -91,7 +91,7 @@ func (pr *ParseRegister) SaveVehicle() ([]int64, error) {
 func (pr *ParseRegister) SaveTravel() (int64, error) {
 	r := pr.Register
 
-	travel := valida.NewTravelRegister()
+	travel := valida.NewTravelRegister(r.CreationTime)
 	travel.SetValorCarga(r.ProductValue)
 	travel.SetChargerType(r.Product)
 
