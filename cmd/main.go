@@ -97,11 +97,6 @@ func main() {
 
 	fmt.Printf("Plus: %d\n", plus)
 
-	//
-	//usecase := parse_register.NewParseRegister(repo)
-	//
-	//usecase.Execute()
-	//printDrivers(ccovRegisterExternal)
 }
 
 func myslqPortalConnection() (*sql.DB, error) {
@@ -159,7 +154,7 @@ func getCompanyId(cnpj string, db *sql.DB) int {
 	return companyId
 }
 
-func saveRegisterInValida(register *ccov.DriverRegisterExternal, db *sql.DB) (int, error) {
+func saveRegisterInValida(register *ccov.DriverRegisterExternal, db *sql.DB) (int64, error) {
 	validaRepo := repository.NewValidaDatabaseRepository(db)
 
 	usecase := parse_register.NewParseRegister(validaRepo, register)
@@ -170,4 +165,18 @@ func saveRegisterInValida(register *ccov.DriverRegisterExternal, db *sql.DB) (in
 	}
 
 	vehicles, _ := usecase.SaveVehicle()
+	travel, _ := usecase.SaveTravel()
+
+	var newRegister int64
+	newRegister, err = usecase.SaveRegister(driverRegisterId, vehicles, travel)
+	if err != nil {
+		return -1, err
+	}
+
+	_, err = usecase.SaveResult(newRegister)
+	if err != nil {
+		color.Red.Printf("Erro ao tentar persistir a liberação do cadastro.")
+	}
+
+	return newRegister, nil
 }

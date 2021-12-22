@@ -1,7 +1,6 @@
 package valida
 
 import (
-	"errors"
 	"time"
 )
 
@@ -10,36 +9,38 @@ const (
 )
 
 type ResultRegister struct {
-	Id                int32     `json:"id"`
-	CadastroId        int32     `json:"cadastro_id"`
-	CodigoLiberacaoId int32     `json:"codigo_liberacao_id"`
-	UsuarioId         int32     `json:"usuario_id"`
+	Id                int64     `json:"id"`
+	CadastroId        int64     `json:"cadastro_id"`
+	CodigoLiberacaoId int       `json:"codigo_liberacao_id"`
+	UsuarioId         int64     `json:"usuario_id"`
 	TipoResultado     string    `json:"tipo_resultado"`
 	Situacao          string    `json:"situacao"`
-	InicioLiberacao   time.Time `json:"inicio_liberacao"`
-	FimLiberacao      time.Time `json:"fim_liberacao"`
+	InicioLiberacao   string    `json:"inicio_liberacao"`
+	FimLiberacao      string    `json:"fim_liberacao"`
 	Criacao           time.Time `json:"criacao"`
 }
 
-func (result ResultRegister) NewResultRegister(cadastro MainRegister, tipoResultado string, situacao string, criacao time.Time) (error, ResultRegister) {
-	result.CadastroId = cadastro.Id
-	result.TipoResultado = tipoResultado
-	result.Situacao = situacao
-	result.Criacao = criacao
-
-	err := IsValidResult(result)
-
-	if err != nil {
-		return err, ResultRegister{}
+func NewResultRegister(cadastroId int64, code int) *ResultRegister {
+	return &ResultRegister{
+		CadastroId:        cadastroId,
+		CodigoLiberacaoId: code,
+		Criacao:           time.Now(),
 	}
-
-	return nil, result
 }
 
-func IsValidResult(result ResultRegister) error {
-	if result.CadastroId == 0 {
-		return errors.New("Não foi informado profissional ou veículo")
+func (res *ResultRegister) SetSituacao(score int) {
+	if score <= 10 {
+		res.Situacao = "DIVERGENTE"
+		res.TipoResultado = "REVERSIVEL"
+	} else {
+		res.Situacao = "ADEQUADO"
+		res.TipoResultado = "TOTAL"
 	}
+}
 
-	return nil
+func (res *ResultRegister) SetValidade(score int, creation time.Time, validity time.Time) {
+	if score > 10 {
+		res.InicioLiberacao = creation.Format("YYYY-MM-DD hh:mm")
+		res.InicioLiberacao = validity.Format("YYYY-MM-DD hh:mm")
+	}
 }

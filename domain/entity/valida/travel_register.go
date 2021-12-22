@@ -10,9 +10,47 @@ type TravelRegister struct {
 	DestinoPaisId    int16     `json:"destino_pais_id"`
 	DestinoUfId      int32     `json:"destino_uf_id"`
 	DestinoCidadeId  int32     `json:"destino_cidade_id"`
-	TipoCarga        []int32   `json:"tipo_carga"`
+	TipoCarga        []int     `json:"tipo_carga"`
 	ValorCarga       float64   `json:"valor_carga"`
 	OrigemCidadeTxt  string    `json:"origem_cidade_txt"`
 	DestinoCidadeTxt string    `json:"destino_cidade_txt"`
 	Criacao          time.Time `json:"criacao"`
+}
+
+func NewTravelRegister() *TravelRegister {
+	now := time.Now()
+	return &TravelRegister{
+		OrigemPaisId:    1,
+		OrigemUfId:      21,
+		OrigemCidadeId:  3980,
+		DestinoPaisId:   1,
+		DestinoUfId:     20,
+		DestinoCidadeId: 3829,
+		Criacao:         now,
+	}
+}
+
+func (tr *TravelRegister) SetValorCarga(valor float64) {
+	tr.ValorCarga = valor
+}
+
+func (tr *TravelRegister) SetChargerType(chargerType string) []int {
+	var tipoCarga []int
+
+	switch chargerType {
+	case "ALGODAO":
+	case "Algodão":
+		tipoCarga = append(tipoCarga, 7)
+		break
+	case "Soja":
+		tipoCarga = append(tipoCarga, 170)
+		break
+
+	default:
+		tipoCarga = append(tipoCarga, 162)
+		break
+	}
+	tipoCarga = append(tipoCarga, 162)
+
+	return tipoCarga
 }

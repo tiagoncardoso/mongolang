@@ -5,6 +5,7 @@ import (
 	"ccovdata/domain/entity/valida"
 	"ccovdata/domain/entity/valida/locker_register"
 	"ccovdata/domain/repository"
+	"gopkg.in/gookit/color.v1"
 	"time"
 )
 
@@ -30,7 +31,6 @@ func (pr *ParseRegister) SaveDriver() (int64, error) {
 		r.Driver.Name,
 		r.Driver.Document,
 		lockerRegister,
-		NOW,
 		r.Driver.State,
 	)
 
@@ -81,16 +81,48 @@ func (pr *ParseRegister) SaveVehicle() ([]int64, error) {
 	return vids, nil
 }
 
-func (pr *ParseRegister) SaveTravel() (int, error) {
+func (pr *ParseRegister) SaveTravel() (int64, error) {
+	r := pr.Register
 
+	travel := valida.NewTravelRegister()
+	travel.SetValorCarga(r.ProductValue)
+	travel.SetChargerType(r.Product)
+
+	tid, _ := pr.Repository.InsertTravel(travel)
+
+	return tid, nil
 }
 
-func (pr *ParseRegister) SaveRegister() (int, error) {
+func (pr *ParseRegister) SaveRegister(driverId int64, vehiclesID []int64, travelId int64) (int64, error) {
+	r := pr.Register
 
+	reg := valida.NewRegister(driverId, vehiclesID[0], vehiclesID[1], vehiclesID[2], vehiclesID[3], travelId)
+	reg.SetPlus(r.IsPlus())
+	reg.SetRegisterValidity(r.RegisterExtra.CreationTime, r.RegisterExtra.ValidityTime, r.RegisterExtra.Score)
+	reg.SetRegisterValidation(r.RegisterExtra.Score)
+
+	rid, err := pr.Repository.InsertRegister(reg)
+	if err != nil {
+		color.Red.Printf("Erro ao salvar cadastro: %s", err)
+	}
+
+	return rid, nil
 }
 
-func (pr *ParseRegister) SaveResult() (int, error) {
+func (pr *ParseRegister) SaveResult(registerId int64) (int64, error) {
+	r := pr.Register
+	code, _ := pr.Repository.GenerateCode()
 
+	result := valida.NewResultRegister(registerId, code)
+	result.SetSituacao(r.RegisterExtra.Score)
+	result.SetValidade(r.RegisterExtra.Score, r.CreationTime, r.RegisterExtra.ValidityTime)
+
+	rid, err := pr.Repository.InsertResultRegister(result)
+	if err != nil {
+		return -1, err
+	}
+
+	return rid, nil
 }
 
 func (pr *ParseRegister) buildDriverLocker() *locker_register.DriverLockerRegister {

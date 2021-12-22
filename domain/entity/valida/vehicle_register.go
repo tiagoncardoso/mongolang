@@ -31,6 +31,7 @@ func NewVehicleRegister(placa string, uf string, gaveta *locker_register.Vehicle
 		CadastroGaveta: gaveta,
 		Uf:             uf,
 		ProprietarioId: 34319,
+		Criacao:        time.Now(),
 	}
 
 	err := ve.IsValid()
