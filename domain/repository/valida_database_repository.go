@@ -64,6 +64,8 @@ func (vdr *ValidaDatabaseRepository) InsertVehicle(veh *valida.VehicleRegister) 
 		return 0, err
 	}
 
+	gaveta, _ := json.Marshal(veh.CadastroGaveta)
+
 	var res sql.Result
 	res, err = stmt.Exec(
 		veh.TipoVinculo,
@@ -71,10 +73,10 @@ func (vdr *ValidaDatabaseRepository) InsertVehicle(veh *valida.VehicleRegister) 
 		veh.ProprietarioId,
 		veh.Renewed(),
 		veh.Placa,
-		veh.CadastroGaveta,
+		gaveta,
 		veh.DefaultImage(),
 		veh.Uf,
-		veh.Criacao.Format("YYYY-MM-DD"),
+		veh.Criacao.Format("2006-01-02 15:04:05"),
 	)
 
 	if err != nil {

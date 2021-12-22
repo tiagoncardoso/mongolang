@@ -32,6 +32,7 @@ func (pr *ParseRegister) SaveDriver() (int64, error) {
 		r.Driver.Document,
 		lockerRegister,
 		r.Driver.State,
+		r.CreationTime,
 	)
 
 	driver.SetTipoVinculo(r.RegisterExtra.DriverProfile)
@@ -52,10 +53,10 @@ func (pr *ParseRegister) SaveDriver() (int64, error) {
 func (pr *ParseRegister) SaveVehicle() ([]int64, error) {
 	var vids []int64
 
-	var vm *valida.VehicleRegister = nil
-	var carr1 *valida.VehicleRegister = nil
-	var carr2 *valida.VehicleRegister = nil
-	var carr3 *valida.VehicleRegister = nil
+	var vm *valida.VehicleRegister
+	var carr1 *valida.VehicleRegister
+	var carr2 *valida.VehicleRegister
+	var carr3 *valida.VehicleRegister
 
 	vm, _ = pr.buildVehicle(0)
 	carr1, _ = pr.buildVehicle(1)
@@ -161,6 +162,7 @@ func (pr *ParseRegister) buildVehicle(id int) (*valida.VehicleRegister, error) {
 		vs[id].Plate,
 		vs[id].StatePlate,
 		lockerRegister,
+		pr.Register.CreationTime,
 	)
 	veic.SetTipoVinculo(pr.Register.RegisterExtra.DriverProfile)
 

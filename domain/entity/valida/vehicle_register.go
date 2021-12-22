@@ -25,13 +25,13 @@ const (
 	FROTA        = 3
 )
 
-func NewVehicleRegister(placa string, uf string, gaveta *locker_register.VehicleLockerRegister) (*VehicleRegister, error) {
+func NewVehicleRegister(placa string, uf string, gaveta *locker_register.VehicleLockerRegister, criacao time.Time) (*VehicleRegister, error) {
 	ve := &VehicleRegister{
 		Placa:          placa,
 		CadastroGaveta: gaveta,
 		Uf:             uf,
 		ProprietarioId: 34319,
-		Criacao:        time.Now(),
+		Criacao:        criacao,
 	}
 
 	err := ve.IsValid()

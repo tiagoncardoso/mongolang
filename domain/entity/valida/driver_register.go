@@ -18,12 +18,12 @@ type DriverRegister struct {
 	Uf             string                                `json:"uf"`
 }
 
-func NewDriverRegister(name string, cpf string, gaveta *locker_register.DriverLockerRegister, uf string) (*DriverRegister, error) {
+func NewDriverRegister(name string, cpf string, gaveta *locker_register.DriverLockerRegister, uf string, createdAt time.Time) (*DriverRegister, error) {
 	dr := &DriverRegister{
 		Id:             0,
 		Name:           name,
 		Cpf:            cpf,
-		Criacao:        time.Now(),
+		Criacao:        createdAt,
 		CadastroGaveta: gaveta,
 		ImgCnh:         "file_chn_mock.jpg",
 		ImgRg:          "file_rg_mock.jpg",
