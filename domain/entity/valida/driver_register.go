@@ -39,6 +39,19 @@ func NewDriverRegister(name string, cpf string, gaveta *locker_register.DriverLo
 	return dr, nil
 }
 
+func (dr *DriverRegister) SetTipoVinculo(tipoVinculo string) {
+	switch tipoVinculo {
+	case "Terceiro":
+		dr.DriverType = AUTONOMO
+	case "Autônomo":
+		dr.DriverType = AUTONOMO
+	case "Agregado":
+		dr.DriverType = AGREGADO
+	case "Frota":
+		dr.DriverType = FROTA
+	}
+}
+
 func (dr *DriverRegister) IsValid() error {
 	if dr.Cpf == "" {
 		return errors.New("The driver register needs contains a valid CPF.")

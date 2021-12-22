@@ -3,6 +3,7 @@ package repository
 import (
 	"ccovdata/domain/entity/valida"
 	"database/sql"
+	"encoding/json"
 	"time"
 )
 
@@ -16,13 +17,16 @@ func NewValidaDatabaseRepository(db *sql.DB) *ValidaDatabaseRepository {
 
 func (vdr *ValidaDatabaseRepository) InsertDriver(dr *valida.DriverRegister) (int64, error) {
 	stmt, err := vdr.db.Prepare(`
-			INSERT INTO profissional(tipo_vinculo_id, profissional_renovado_id, nome, cpf, cadastro_gaveta, criacao, img_cnh, uf, criacao) VALUES
-			(?, ?, ?, ?, ?, ?, ?, ?, ?)
+			INSERT INTO profissional(tipo_vinculo_id, profissional_renovado_id, nome, cpf, cadastro_gaveta, criacao, img_cnh, uf) VALUES
+			(?, ?, ?, ?, ?, ?, ?, ?)
 	`)
 
 	if err != nil {
 		return 0, err
 	}
+
+	gaveta, _ := json.Marshal(dr.CadastroGaveta)
+	createAt := dr.Criacao.Format("2006-01-02 15:04:05")
 
 	var res sql.Result
 	res, err = stmt.Exec(
@@ -30,10 +34,10 @@ func (vdr *ValidaDatabaseRepository) InsertDriver(dr *valida.DriverRegister) (in
 		dr.Renewed(),
 		dr.Name,
 		dr.Cpf,
-		dr.CadastroGaveta,
+		gaveta,
+		createAt,
 		dr.DefaultImage(),
 		dr.Uf,
-		dr.Criacao.Format("YYYY-MM-DD"),
 	)
 
 	if err != nil {

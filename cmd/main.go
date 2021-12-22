@@ -62,7 +62,7 @@ func main() {
 	}
 
 	var dbValida *sql.DB
-	dbPortal, err = mysqlValidaConnection()
+	dbValida, err = mysqlValidaConnection()
 	if err != nil {
 		log.Fatal(err)
 	}
