@@ -65,18 +65,22 @@ func (pr *ParseRegister) SaveVehicle() ([]int64, error) {
 
 	var vid int64
 	if vm != nil {
+		vm.SetVehicleType(1)
 		vid, _ = pr.Repository.InsertVehicle(vm)
 		vids = append(vids, vid)
 	}
 	if carr1 != nil {
+		carr1.SetVehicleType(2)
 		vid, _ = pr.Repository.InsertVehicle(carr1)
 		vids = append(vids, vid)
 	}
 	if carr2 != nil {
+		carr1.SetVehicleType(2)
 		vid, _ = pr.Repository.InsertVehicle(carr2)
 		vids = append(vids, vid)
 	}
 	if carr3 != nil {
+		carr1.SetVehicleType(2)
 		vid, _ = pr.Repository.InsertVehicle(carr3)
 		vids = append(vids, vid)
 	}

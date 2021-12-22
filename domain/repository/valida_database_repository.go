@@ -56,7 +56,7 @@ func (vdr *ValidaDatabaseRepository) InsertDriver(dr *valida.DriverRegister) (in
 
 func (vdr *ValidaDatabaseRepository) InsertVehicle(veh *valida.VehicleRegister) (int64, error) {
 	stmt, err := vdr.db.Prepare(`
-			INSERT INTO veiculo(tipo_vinculo_id, tipo_veiculo_id, proprietario_id, veiculo_renovado_id, placa, cadastro_gaveta, criacao, img_crlv, uf) VALUES
+			INSERT INTO veiculo(tipo_vinculo_id, tipo_veiculo_id, proprietario_id, veiculo_renovado_id, placa, cadastro_gaveta, img_crlv, uf, criacao) VALUES
 			(?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`)
 

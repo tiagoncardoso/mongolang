@@ -3,7 +3,7 @@ package locker_register
 type VehicleLockerRegister struct {
 	Placa                   string  `json:"placa"`
 	Antt                    string  `json:"antt"`
-	Rastreador              string  `json:"rastreador"`
+	Rastreador              int     `json:"rastreador"`
 	Uf                      string  `json:"uf"`
 	CadastroFull            *string `json:"cadastroFull"`
 	TipoVeiculo             string  `json:"tipoVeiculo"`
@@ -11,7 +11,9 @@ type VehicleLockerRegister struct {
 }
 
 func NewVehicleLockerRegister() *VehicleLockerRegister {
-	return &VehicleLockerRegister{}
+	return &VehicleLockerRegister{
+		Rastreador: 0,
+	}
 }
 
 func (vlr *VehicleLockerRegister) SetVehicleData(placa string, antt string, uf string) {

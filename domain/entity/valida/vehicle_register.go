@@ -56,6 +56,10 @@ func (ve *VehicleRegister) SetTipoVinculo(tipoVinculo string) {
 	}
 }
 
+func (ve *VehicleRegister) SetVehicleType(vehicleType int) {
+	ve.TipoVeiculoId = vehicleType
+}
+
 func (ve *VehicleRegister) Renewed() *VehicleRegister {
 	return nil
 }
