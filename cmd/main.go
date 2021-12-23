@@ -17,7 +17,7 @@ import (
 	"os"
 )
 
-var limit = 5000
+var limit = 10
 
 func connect(dsn string) (error, *mongo.Client, context.Context) {
 	var ctx context.Context
@@ -97,7 +97,6 @@ func main() {
 	}
 
 	fmt.Printf("Plus: %d\n", plus)
-
 }
 
 func myslqPortalConnection() (*sql.DB, error) {
@@ -176,12 +175,12 @@ func saveRegisterInValida(register *ccov.DriverRegisterExternal, db *sql.DB) (in
 
 	_, err = usecase.SaveResult(newRegister)
 	if err != nil {
-		color.Red.Printf("Erro ao tentar persistir a liberação do cadastro.")
+		color.Red.Printf("Erro ao tentar persistir a liberação do cadastro: %s\n\n", err)
 	}
 
 	_, err = usecase.SaveDemand(newRegister)
 	if err != nil {
-		color.Red.Printf("Erro ao tentar persistir a demanda do cadastro.")
+		color.Red.Printf("Erro ao tentar persistir a demanda do cadastro: %s\n\n", err)
 	}
 
 	return newRegister, nil

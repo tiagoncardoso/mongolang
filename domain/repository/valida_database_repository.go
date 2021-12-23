@@ -190,14 +190,29 @@ func (vdr *ValidaDatabaseRepository) InsertResultRegister(result *valida.ResultR
 		return 0, err
 	}
 
+	inicioLiberacao := sql.NullString{}
+	fimLiberacao := sql.NullString{}
+
+	if result.InicioLiberacao != "" || result.FimLiberacao != "" {
+		inicioLiberacao = sql.NullString{
+			String: result.InicioLiberacao,
+			Valid:  true,
+		}
+
+		fimLiberacao = sql.NullString{
+			String: result.FimLiberacao,
+			Valid:  true,
+		}
+	}
+
 	res, err := stmt.Exec(
 		result.CadastroId,
 		result.CodigoLiberacaoId,
 		1,
 		result.TipoResultado,
 		result.Situacao,
-		result.InicioLiberacao,
-		result.FimLiberacao,
+		inicioLiberacao,
+		fimLiberacao,
 		result.Criacao,
 	)
 
