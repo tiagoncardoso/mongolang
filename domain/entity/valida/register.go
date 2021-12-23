@@ -17,9 +17,10 @@ type Register struct {
 	Criacao          time.Time `json:"criacao"`
 	Criminal         bool      `json:"criminal"`
 	Plus             bool      `json:"plus"`
+	CcovProtocol     string    `json:"ccov_protocol"`
 }
 
-func NewRegister(profissionalId int64, motorId int64, carreta1Id int64, carreta2Id int64, carreta3Id int64, viagemId int64) *Register {
+func NewRegister(profissionalId int64, motorId int64, carreta1Id int64, carreta2Id int64, carreta3Id int64, viagemId int64, protocol string, createdAt time.Time) *Register {
 	return &Register{
 		ProfissionalId: profissionalId,
 		MotorId:        motorId,
@@ -29,8 +30,9 @@ func NewRegister(profissionalId int64, motorId int64, carreta1Id int64, carreta2
 		ViagemId:       viagemId,
 		Validado:       true,
 		TipoCadastro:   "PROFISSIONAL_VEICULO",
-		Criacao:        time.Now(),
+		Criacao:        createdAt,
 		Criminal:       false,
+		CcovProtocol:   protocol,
 	}
 }
 
@@ -40,7 +42,9 @@ func (re *Register) SetPlus(isPlus bool) {
 
 func (re *Register) SetRegisterValidity(creation time.Time, validity time.Time, score int) {
 	if score <= 10 {
-		re.ValidadeCadastro = creation.Format("YYYY-MM-DD")
+		re.ValidadeCadastro = creation.Format("2006-01-02 15:04:05")
+	} else {
+		re.ValidadeCadastro = validity.Format("2006-01-02 15:04:05")
 	}
 }
 

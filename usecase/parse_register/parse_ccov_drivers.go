@@ -5,6 +5,7 @@ import (
 	"ccovdata/domain/entity/valida"
 	"ccovdata/domain/entity/valida/locker_register"
 	"ccovdata/domain/repository"
+	"fmt"
 	"gopkg.in/gookit/color.v1"
 	"time"
 )
@@ -102,8 +103,35 @@ func (pr *ParseRegister) SaveTravel() (int64, error) {
 
 func (pr *ParseRegister) SaveRegister(driverId int64, vehiclesID []int64, travelId int64) (int64, error) {
 	r := pr.Register
+	vehiclesSize := len(vehiclesID)
 
-	reg := valida.NewRegister(driverId, vehiclesID[0], vehiclesID[1], vehiclesID[2], vehiclesID[3], travelId)
+	var vehicle int64
+	var carreta1 int64
+	var carreta2 int64
+	var carreta3 int64
+
+	switch vehiclesSize {
+	case 4:
+		carreta3 = vehiclesID[3]
+		carreta2 = vehiclesID[2]
+		carreta1 = vehiclesID[1]
+		vehicle = vehiclesID[0]
+	case 3:
+		carreta2 = vehiclesID[2]
+		carreta1 = vehiclesID[1]
+		vehicle = vehiclesID[0]
+	case 2:
+		carreta1 = vehiclesID[1]
+		vehicle = vehiclesID[0]
+	case 1:
+		vehicle = vehiclesID[0]
+	}
+
+	if vehiclesSize != 4 {
+		fmt.Printf("1 é null")
+	}
+
+	reg := valida.NewRegister(driverId, vehicle, carreta1, carreta2, carreta3, travelId, r.RegisterExtra.Protocol, r.CreationTime)
 	reg.SetPlus(r.IsPlus())
 	reg.SetRegisterValidity(r.RegisterExtra.CreationTime, r.RegisterExtra.ValidityTime, r.RegisterExtra.Score)
 	reg.SetRegisterValidation(r.RegisterExtra.Score)

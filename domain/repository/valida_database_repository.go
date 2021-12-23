@@ -135,21 +135,26 @@ func (vdr *ValidaDatabaseRepository) InsertTravel(tr *valida.TravelRegister) (in
 
 func (vdr *ValidaDatabaseRepository) InsertRegister(reg *valida.Register) (int64, error) {
 	stmt, err := vdr.db.Prepare(`
-			INSERT INTO cadastro(profissional_id, motor_id, carreta1_id, carreta2_id, carreta3_id, viagem_id, tipo_cadastro, validado, validade_cadastro, status, criacao, criminal, plus) 
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			INSERT INTO cadastro(profissional_id, motor_id, carreta1_id, carreta2_id, carreta3_id, viagem_id, tipo_cadastro, validado, validade_cadastro, status, criacao, criminal, plus, protocolo_ccov) 
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`)
 
 	if err != nil {
 		return 0, err
 	}
 
+	vm := getVehicleId(reg.MotorId)
+	ca1 := getVehicleId(reg.Carreta1Id)
+	ca2 := getVehicleId(reg.Carreta2Id)
+	ca3 := getVehicleId(reg.Carreta3Id)
+
 	var res sql.Result
 	res, err = stmt.Exec(
 		reg.ProfissionalId,
-		reg.MotorId,
-		reg.Carreta1Id,
-		reg.Carreta2Id,
-		reg.Carreta3Id,
+		vm,
+		ca1,
+		ca2,
+		ca3,
 		reg.ViagemId,
 		reg.TipoCadastro,
 		reg.Validado,
@@ -158,6 +163,7 @@ func (vdr *ValidaDatabaseRepository) InsertRegister(reg *valida.Register) (int64
 		reg.Criacao,
 		reg.Criminal,
 		reg.Plus,
+		reg.CcovProtocol,
 	)
 
 	if err != nil {
@@ -234,4 +240,17 @@ func (vdr *ValidaDatabaseRepository) GenerateCode() (int, error) {
 	}
 
 	return newCode, nil
+}
+
+func getVehicleId(vehicleId int64) sql.NullInt64 {
+	vid := sql.NullInt64{}
+
+	if vehicleId > 0 {
+		vid = sql.NullInt64{
+			Int64: vehicleId,
+			Valid: true,
+		}
+	}
+
+	return vid
 }
