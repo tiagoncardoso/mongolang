@@ -215,6 +215,39 @@ func (vdr *ValidaDatabaseRepository) InsertResultRegister(result *valida.ResultR
 	return lid, nil
 }
 
+func (vdr *ValidaDatabaseRepository) InsertDemandRegister(demand *valida.DemandRegister) (int64, error) {
+	stmt, err := vdr.db.Prepare(`
+			INSERT INTO demanda(cadastro_id, usuario_id, empresa_id, criacao, primeiro_cadastro, de_formulario) 
+			VALUES (?, ?, ?, ?, ?, ?)
+	`)
+
+	if err != nil {
+		return 0, err
+	}
+
+	res, err := stmt.Exec(
+		demand.CadastroId,
+		demand.UsuarioId,
+		demand.EmpresaId,
+		demand.Criacao,
+		demand.PrimeiroCadastro,
+		demand.DeFormulario,
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	var lid int64
+	lid, err = res.LastInsertId()
+
+	if err != nil {
+		return 0, err
+	}
+
+	return lid, nil
+}
+
 func (vdr *ValidaDatabaseRepository) GenerateCode() (int64, error) {
 	var newCode int
 	codeType := "L"

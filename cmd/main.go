@@ -179,5 +179,10 @@ func saveRegisterInValida(register *ccov.DriverRegisterExternal, db *sql.DB) (in
 		color.Red.Printf("Erro ao tentar persistir a liberação do cadastro.")
 	}
 
+	_, err = usecase.SaveDemand(newRegister)
+	if err != nil {
+		color.Red.Printf("Erro ao tentar persistir a demanda do cadastro.")
+	}
+
 	return newRegister, nil
 }
