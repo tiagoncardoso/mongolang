@@ -182,7 +182,7 @@ func (vdr *ValidaDatabaseRepository) InsertRegister(reg *valida.Register) (int64
 
 func (vdr *ValidaDatabaseRepository) InsertResultRegister(result *valida.ResultRegister) (int64, error) {
 	stmt, err := vdr.db.Prepare(`
-			INSERT INTO resultado(cadastro, codigo_liberacao_id, usuario_id, tipo_resultado, situacao, inicio_liberacao, fim_liberacao, criacao) 
+			INSERT INTO resultado(cadastro_id, codigo_liberacao_id, usuario_id, tipo_resultado, situacao, inicio_liberacao, fim_liberacao, criacao) 
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	`)
 
@@ -215,7 +215,7 @@ func (vdr *ValidaDatabaseRepository) InsertResultRegister(result *valida.ResultR
 	return lid, nil
 }
 
-func (vdr *ValidaDatabaseRepository) GenerateCode() (int, error) {
+func (vdr *ValidaDatabaseRepository) GenerateCode() (int64, error) {
 	var newCode int
 	codeType := "L"
 
@@ -229,7 +229,8 @@ func (vdr *ValidaDatabaseRepository) GenerateCode() (int, error) {
 			(?, ?, ?)
 	`)
 
-	_, err = stmt.Exec(
+	var res sql.Result
+	res, err = stmt.Exec(
 		codeType,
 		newCode,
 		time.Now(),
@@ -239,7 +240,9 @@ func (vdr *ValidaDatabaseRepository) GenerateCode() (int, error) {
 		return -1, err
 	}
 
-	return newCode, nil
+	lid, _ := res.LastInsertId()
+
+	return lid, nil
 }
 
 func getVehicleId(vehicleId int64) sql.NullInt64 {

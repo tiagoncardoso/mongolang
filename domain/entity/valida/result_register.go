@@ -11,7 +11,7 @@ const (
 type ResultRegister struct {
 	Id                int64     `json:"id"`
 	CadastroId        int64     `json:"cadastro_id"`
-	CodigoLiberacaoId int       `json:"codigo_liberacao_id"`
+	CodigoLiberacaoId int64     `json:"codigo_liberacao_id"`
 	UsuarioId         int64     `json:"usuario_id"`
 	TipoResultado     string    `json:"tipo_resultado"`
 	Situacao          string    `json:"situacao"`
@@ -20,11 +20,11 @@ type ResultRegister struct {
 	Criacao           time.Time `json:"criacao"`
 }
 
-func NewResultRegister(cadastroId int64, code int) *ResultRegister {
+func NewResultRegister(cadastroId int64, code int64, createdAt time.Time) *ResultRegister {
 	return &ResultRegister{
 		CadastroId:        cadastroId,
 		CodigoLiberacaoId: code,
-		Criacao:           time.Now(),
+		Criacao:           createdAt,
 	}
 }
 
@@ -40,7 +40,7 @@ func (res *ResultRegister) SetSituacao(score int) {
 
 func (res *ResultRegister) SetValidade(score int, creation time.Time, validity time.Time) {
 	if score > 10 {
-		res.InicioLiberacao = creation.Format("YYYY-MM-DD hh:mm")
-		res.InicioLiberacao = validity.Format("YYYY-MM-DD hh:mm")
+		res.InicioLiberacao = creation.Format("2006-01-02 15:04:05")
+		res.FimLiberacao = validity.Format("2006-01-02 15:04:05")
 	}
 }

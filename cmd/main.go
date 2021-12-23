@@ -86,9 +86,10 @@ func main() {
 			color.Green.Printf("%d: \nPortal ID %d (%s) | %s - Plus: %t\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name, v.IsPlus())
 			color.Yellow.Printf("%d\n\n", newRegisterId)
 			plus += 1
+		} else {
+			color.White.Printf("%d: \nPortal ID %d (%s) | %s - Plus: %t\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name, v.IsPlus())
+			color.Yellow.Printf("%d\n\n", newRegisterId)
 		}
-		color.White.Printf("%d: \nPortal ID %d (%s) | %s - Plus: %t\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name, v.IsPlus())
-		color.Yellow.Printf("%d\n\n", newRegisterId)
 
 		if i > limit {
 			break

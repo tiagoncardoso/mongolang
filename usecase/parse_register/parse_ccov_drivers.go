@@ -148,7 +148,7 @@ func (pr *ParseRegister) SaveResult(registerId int64) (int64, error) {
 	r := pr.Register
 	code, _ := pr.Repository.GenerateCode()
 
-	result := valida.NewResultRegister(registerId, code)
+	result := valida.NewResultRegister(registerId, code, r.CreationTime)
 	result.SetSituacao(r.RegisterExtra.Score)
 	result.SetValidade(r.RegisterExtra.Score, r.CreationTime, r.RegisterExtra.ValidityTime)
 
