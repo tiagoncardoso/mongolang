@@ -17,7 +17,7 @@ import (
 	"os"
 )
 
-var limit = 10
+var limit = 100
 
 func connect(dsn string) (error, *mongo.Client, context.Context) {
 	var ctx context.Context

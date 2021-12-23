@@ -193,7 +193,7 @@ func (vdr *ValidaDatabaseRepository) InsertResultRegister(result *valida.ResultR
 	inicioLiberacao := sql.NullString{}
 	fimLiberacao := sql.NullString{}
 
-	if result.InicioLiberacao != "" || result.FimLiberacao != "" {
+	if result.Situacao == "ADEQUADO" {
 		inicioLiberacao = sql.NullString{
 			String: result.InicioLiberacao,
 			Valid:  true,

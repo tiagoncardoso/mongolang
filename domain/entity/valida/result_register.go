@@ -1,6 +1,7 @@
 package valida
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -9,22 +10,22 @@ const (
 )
 
 type ResultRegister struct {
-	Id                int64     `json:"id"`
-	CadastroId        int64     `json:"cadastro_id"`
-	CodigoLiberacaoId int64     `json:"codigo_liberacao_id"`
-	UsuarioId         int64     `json:"usuario_id"`
-	TipoResultado     string    `json:"tipo_resultado"`
-	Situacao          string    `json:"situacao"`
-	InicioLiberacao   string    `json:"inicio_liberacao"`
-	FimLiberacao      string    `json:"fim_liberacao"`
-	Criacao           time.Time `json:"criacao"`
+	Id                int64         `json:"id"`
+	CadastroId        int64         `json:"cadastro_id"`
+	CodigoLiberacaoId sql.NullInt64 `json:"codigo_liberacao_id"`
+	UsuarioId         int64         `json:"usuario_id"`
+	TipoResultado     string        `json:"tipo_resultado"`
+	Situacao          string        `json:"situacao"`
+	InicioLiberacao   string        `json:"inicio_liberacao"`
+	FimLiberacao      string        `json:"fim_liberacao"`
+	Criacao           time.Time     `json:"criacao"`
 }
 
-func NewResultRegister(cadastroId int64, code int64, createdAt time.Time) *ResultRegister {
+func NewResultRegister(cadastroId int64, createdAt time.Time) *ResultRegister {
 	return &ResultRegister{
 		CadastroId:        cadastroId,
-		CodigoLiberacaoId: code,
 		Criacao:           createdAt,
+		CodigoLiberacaoId: sql.NullInt64{},
 	}
 }
 
@@ -42,5 +43,12 @@ func (res *ResultRegister) SetValidade(score int, creation time.Time, validity t
 	if score > 10 {
 		res.InicioLiberacao = creation.Format("2006-01-02 15:04:05")
 		res.FimLiberacao = validity.Format("2006-01-02 15:04:05")
+	}
+}
+
+func (res *ResultRegister) SetCode(code int64) {
+	res.CodigoLiberacaoId = sql.NullInt64{
+		Int64: code,
+		Valid: true,
 	}
 }

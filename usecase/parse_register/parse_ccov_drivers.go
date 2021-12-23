@@ -141,11 +141,15 @@ func (pr *ParseRegister) SaveRegister(driverId int64, vehiclesID []int64, travel
 
 func (pr *ParseRegister) SaveResult(registerId int64) (int64, error) {
 	r := pr.Register
-	code, _ := pr.Repository.GenerateCode()
 
-	result := valida.NewResultRegister(registerId, code, r.CreationTime)
+	result := valida.NewResultRegister(registerId, r.CreationTime)
 	result.SetSituacao(r.RegisterExtra.Score)
 	result.SetValidade(r.RegisterExtra.Score, r.CreationTime, r.RegisterExtra.ValidityTime)
+
+	if result.Situacao == "ADEQUADO" {
+		code, _ := pr.Repository.GenerateCode()
+		result.SetCode(code)
+	}
 
 	rid, err := pr.Repository.InsertResultRegister(result)
 	if err != nil {
