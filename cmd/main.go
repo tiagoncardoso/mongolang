@@ -17,7 +17,8 @@ import (
 	"os"
 )
 
-var limit = 100
+var start = 6427
+var limit = 68024
 
 func connect(dsn string) (error, *mongo.Client, context.Context) {
 	var ctx context.Context
@@ -69,34 +70,38 @@ func main() {
 
 	plus := 0
 	for i, v := range ccovRegisterExternal {
-		companyExtraData := getCompanyCnpjById(v.Company, db, ctx)
-		registerExtraData := getCompleteRegisterById(v.Id, db, ctx)
-		CompanyId := getCompanyId(companyExtraData.Document, dbPortal)
-
-		v.CompanyExtra = companyExtraData
-		v.RegisterExtra = registerExtraData
-		v.CompanyPortalId = CompanyId
-
-		newRegisterId, err := saveRegisterInValida(v, dbValida)
-		if err != nil {
-			log.Fatal("Não foi possível persistir o novo cadastro.")
-		}
-
-		if v.IsPlus() {
-			color.Green.Printf("%d: \nPortal ID %d (%s) | %s - Plus: %t\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name, v.IsPlus())
-			color.Yellow.Printf("%d\n\n", newRegisterId)
-			plus += 1
+		if i < start {
+			color.Gray.Printf("> Ignorando %s\n", v.Driver.Name)
 		} else {
-			color.White.Printf("%d: \nPortal ID %d (%s) | %s - Plus: %t\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name, v.IsPlus())
-			color.Yellow.Printf("%d\n\n", newRegisterId)
+			companyExtraData := getCompanyCnpjById(v.Company, db, ctx)
+			registerExtraData := getCompleteRegisterById(v.Id, db, ctx)
+			CompanyId := getCompanyId(companyExtraData.Document, dbPortal)
+
+			v.CompanyExtra = companyExtraData
+			v.RegisterExtra = registerExtraData
+			v.CompanyPortalId = CompanyId
+
+			newRegisterId, err := saveRegisterInValida(v, dbValida)
+			if err != nil {
+				log.Fatal("Não foi possível persistir o novo cadastro.")
+			}
+
+			if v.IsPlus() {
+				color.Green.Printf("%d: \nPortal ID %d (%s) | %s - Plus: %t\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name, v.IsPlus())
+				color.Yellow.Printf("%d\n\n", newRegisterId)
+				plus += 1
+			} else {
+				color.White.Printf("%d: \nPortal ID %d (%s) | %s - Plus: %t\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name, v.IsPlus())
+				color.Yellow.Printf("%d\n\n", newRegisterId)
+			}
+
+			if i > limit {
+				break
+			}
 		}
 
-		if i > limit {
-			break
-		}
+		fmt.Printf("Plus: %d\n", plus)
 	}
-
-	fmt.Printf("Plus: %d\n", plus)
 }
 
 func myslqPortalConnection() (*sql.DB, error) {
