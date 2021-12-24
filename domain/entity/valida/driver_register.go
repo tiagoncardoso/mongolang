@@ -49,6 +49,8 @@ func (dr *DriverRegister) SetTipoVinculo(tipoVinculo string) {
 		dr.DriverType = AGREGADO
 	case "Frota":
 		dr.DriverType = FROTA
+	case "RH":
+		dr.DriverType = ADMINISTRATIVO
 	}
 }
 

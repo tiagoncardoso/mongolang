@@ -17,7 +17,7 @@ import (
 	"os"
 )
 
-var start = 6427
+var start = 56426
 var limit = 68024
 
 func connect(dsn string) (error, *mongo.Client, context.Context) {
@@ -83,6 +83,7 @@ func main() {
 
 			newRegisterId, err := saveRegisterInValida(v, dbValida)
 			if err != nil {
+				color.Red.Printf("%s\n", err)
 				log.Fatal("Não foi possível persistir o novo cadastro.")
 			}
 

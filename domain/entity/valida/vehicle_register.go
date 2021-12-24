@@ -20,9 +20,10 @@ type VehicleRegister struct {
 }
 
 const (
-	AUTONOMO int = 1
-	AGREGADO     = 2
-	FROTA        = 3
+	AUTONOMO       int = 1
+	AGREGADO           = 2
+	FROTA              = 3
+	ADMINISTRATIVO     = 7
 )
 
 func NewVehicleRegister(placa string, uf string, gaveta *locker_register.VehicleLockerRegister, criacao time.Time) (*VehicleRegister, error) {

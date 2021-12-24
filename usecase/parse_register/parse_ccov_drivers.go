@@ -35,7 +35,7 @@ func (pr *ParseRegister) SaveDriver() (int64, error) {
 		r.CreationTime,
 	)
 
-	driver.SetTipoVinculo(r.RegisterExtra.DriverProfile)
+	driver.SetTipoVinculo(r.Driver.DriverProfile)
 
 	if err != nil {
 		return 0, err
