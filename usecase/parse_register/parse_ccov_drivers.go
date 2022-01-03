@@ -6,17 +6,14 @@ import (
 	"ccovdata/domain/entity/valida/locker_register"
 	"ccovdata/domain/repository"
 	"gopkg.in/gookit/color.v1"
-	"time"
 )
-
-var NOW = time.Now()
 
 type ParseRegister struct {
 	Repository *repository.ValidaDatabaseRepository
-	Register   *ccov.DriverRegisterExternal
+	Register   *ccov.DriverRegister
 }
 
-func NewParseRegister(repository *repository.ValidaDatabaseRepository, register *ccov.DriverRegisterExternal) *ParseRegister {
+func NewParseRegister(repository *repository.ValidaDatabaseRepository, register *ccov.DriverRegister) *ParseRegister {
 	return &ParseRegister{
 		Repository: repository,
 		Register:   register,
@@ -28,14 +25,14 @@ func (pr *ParseRegister) SaveDriver() (int64, error) {
 	lockerRegister := pr.buildDriverLocker()
 
 	driver, err := valida.NewDriverRegister(
-		r.Driver.Name,
-		r.Driver.Document,
+		r.Name,
+		r.Document,
 		lockerRegister,
-		r.Driver.State,
+		r.State,
 		r.CreationTime,
 	)
 
-	driver.SetTipoVinculo(r.Driver.DriverProfile)
+	driver.SetTipoVinculo(r.DriverProfile)
 
 	if err != nil {
 		return 0, err
@@ -92,7 +89,7 @@ func (pr *ParseRegister) SaveTravel() (int64, error) {
 	r := pr.Register
 
 	travel := valida.NewTravelRegister(r.CreationTime)
-	travel.SetValorCarga(r.ProductValue)
+	travel.SetValorCarga(10000)
 	travel.SetChargerType(r.Product)
 
 	tid, _ := pr.Repository.InsertTravel(travel)
@@ -127,7 +124,7 @@ func (pr *ParseRegister) SaveRegister(driverId int64, vehiclesID []int64, travel
 	}
 
 	reg := valida.NewRegister(driverId, vehicle, carreta1, carreta2, carreta3, travelId, r.RegisterExtra.Protocol, r.CreationTime)
-	reg.SetPlus(r.IsPlus())
+	reg.SetPlus(false)
 	reg.SetRegisterValidity(r.RegisterExtra.CreationTime, r.RegisterExtra.ValidityTime, r.RegisterExtra.Score)
 	reg.SetRegisterValidation(r.RegisterExtra.Score)
 
@@ -143,8 +140,8 @@ func (pr *ParseRegister) SaveResult(registerId int64) (int64, error) {
 	r := pr.Register
 
 	result := valida.NewResultRegister(registerId, r.CreationTime)
-	result.SetSituacao(r.RegisterExtra.Score)
-	result.SetValidade(r.RegisterExtra.Score, r.CreationTime, r.RegisterExtra.ValidityTime)
+	result.SetSituacao(r.Score)
+	result.SetValidade(r.Score, r.CreationTime, r.ValidityTime)
 
 	if result.Situacao == "ADEQUADO" {
 		code, _ := pr.Repository.GenerateCode()
@@ -207,7 +204,7 @@ func (pr *ParseRegister) buildVehicle(id int) (*valida.VehicleRegister, error) {
 		lockerRegister,
 		pr.Register.CreationTime,
 	)
-	veic.SetTipoVinculo(pr.Register.RegisterExtra.DriverProfile)
+	veic.SetTipoVinculo(pr.Register.DriverProfile)
 
 	return veic, nil
 }

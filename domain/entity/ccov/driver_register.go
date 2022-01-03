@@ -42,6 +42,7 @@ type DriverRegister struct {
 	ReferenceLandline              string             `bson:"ReferenceLandline"`
 	Protocol                       string             `bson:"Protocol"`
 	ProductValue                   int                `bson:"ProductValue"`
+	DeviceRegisters                []Vehicle          `bson:"DeviceRegisters"`
 	Product                        string             `bson:"Product"`
 	RegisterSpecial                bool               `bson:"RegisterSpecial"`
 	Score                          int                `bson:"Score"`
@@ -49,6 +50,11 @@ type DriverRegister struct {
 	ValidityTime                   time.Time          `bson:"ValidityTime"`
 	BlockedDriver                  bool               `bson:"BlockedDriver"`
 	ExternalId                     string             `bson:"ExternalId"`
+	Company                        string             `bson:"Company"`
+	CompanyID                      string             `bson:"CompanyID"`
+	CompanyExtra                   *Company           `bson:"CompanyExtra"`
+	CompanyPortalId                int                `bson:"CompanyPortalId"`
+	RegisterExtra                  *DriverRegister    `bson:"RegisterExtra"`
 }
 
 func NewDriverRegister() *DriverRegister {

@@ -17,8 +17,9 @@ import (
 	"os"
 )
 
-var start = 56426
+var start = 0
 var limit = 68024
+var companyName = "AGUIA TRANSPORTE E LOGISTICA EIRELI"
 
 func connect(dsn string) (error, *mongo.Client, context.Context) {
 	var ctx context.Context
@@ -48,7 +49,8 @@ func main() {
 	fmt.Println("Iniciando busca de cadastros Ccov.")
 
 	repo := repository.NewCcovRegisterRepository(db, ctx)
-	ccovRegisterExternal, err := repo.GetRegisterExternal("DriverRegisterExternal", ctx)
+	//ccovRegisterExternal, err := repo.GetRegisterExternal("DriverRegisterExternal", ctx) --> FindAll
+	ccovRegisterExternal, err := repo.GetRegister("DriverRegister", ctx, companyName)
 
 	fmt.Printf("Números de cadastros encontrados: %d\n\n", len(ccovRegisterExternal))
 
@@ -71,7 +73,7 @@ func main() {
 	plus := 0
 	for i, v := range ccovRegisterExternal {
 		if i < start {
-			color.Gray.Printf("> Ignorando %s\n", v.Driver.Name)
+			color.Gray.Printf("> Ignorando %s\n", v.Name)
 		} else {
 			companyExtraData := getCompanyCnpjById(v.Company, db, ctx)
 			registerExtraData := getCompleteRegisterById(v.Id, db, ctx)
@@ -87,14 +89,8 @@ func main() {
 				log.Fatal("Não foi possível persistir o novo cadastro.")
 			}
 
-			if v.IsPlus() {
-				color.Green.Printf("%d: \nPortal ID %d (%s) | %s - Plus: %t\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name, v.IsPlus())
-				color.Yellow.Printf("%d\n\n", newRegisterId)
-				plus += 1
-			} else {
-				color.White.Printf("%d: \nPortal ID %d (%s) | %s - Plus: %t\n", i+1, v.CompanyPortalId, v.Company, v.Driver.Name, v.IsPlus())
-				color.Yellow.Printf("%d\n\n", newRegisterId)
-			}
+			color.Green.Printf("%d: \nPortal ID %d (%s) | %s\n", i+1, v.CompanyPortalId, v.Company, v.Name)
+			color.Yellow.Printf("%d\n\n", newRegisterId)
 
 			if i > limit {
 				break
@@ -160,7 +156,7 @@ func getCompanyId(cnpj string, db *sql.DB) int {
 	return companyId
 }
 
-func saveRegisterInValida(register *ccov.DriverRegisterExternal, db *sql.DB) (int64, error) {
+func saveRegisterInValida(register *ccov.DriverRegister, db *sql.DB) (int64, error) {
 	validaRepo := repository.NewValidaDatabaseRepository(db)
 
 	usecase := parse_register.NewParseRegister(validaRepo, register)
