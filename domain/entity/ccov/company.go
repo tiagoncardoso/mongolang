@@ -1,7 +1,8 @@
 package ccov
 
 type Company struct {
-	Document string `json:"Document"`
+	Document string `bson:"Document"`
+	Name     string `bson:"Name"`
 }
 
 func NewCompany() *Company {

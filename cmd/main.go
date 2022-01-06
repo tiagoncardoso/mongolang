@@ -17,9 +17,9 @@ import (
 	"os"
 )
 
-var start = 0
-var limit = 68024
-var companyName = "AGUIA TRANSPORTE E LOGISTICA EIRELI"
+var start = 6
+var limit = 9
+var companyName = "DIONE GUIMARAES LARA"
 
 func connect(dsn string) (error, *mongo.Client, context.Context) {
 	var ctx context.Context
@@ -85,12 +85,11 @@ func main() {
 
 			newRegisterId, err := saveRegisterInValida(v, dbValida)
 			if err != nil {
-				color.Red.Printf("%s\n", err)
-				log.Fatal("Não foi possível persistir o novo cadastro.")
+				color.Red.Printf("ERR Cadastro (%s | %s): %s\n", v.Document, v.CompanyExtra.Name, err)
+			} else {
+				color.Green.Printf("%d: \nPortal ID %d (%s) | %s\n", i+1, v.CompanyPortalId, v.Company, v.Name)
+				color.Yellow.Printf("%d\n\n", newRegisterId)
 			}
-
-			color.Green.Printf("%d: \nPortal ID %d (%s) | %s\n", i+1, v.CompanyPortalId, v.Company, v.Name)
-			color.Yellow.Printf("%d\n\n", newRegisterId)
 
 			if i > limit {
 				break
