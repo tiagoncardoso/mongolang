@@ -41,7 +41,7 @@ type DriverRegister struct {
 	CommercialLandline             string             `bson:"CommercialLandline"`
 	ReferenceLandline              string             `bson:"ReferenceLandline"`
 	Protocol                       string             `bson:"Protocol"`
-	ProductValue                   int                `bson:"ProductValue"`
+	ProductValue                   float64            `bson:"ProductValue"`
 	DeviceRegisters                []Vehicle          `bson:"DeviceRegisters"`
 	Product                        string             `bson:"Product"`
 	RegisterSpecial                bool               `bson:"RegisterSpecial"`
@@ -59,4 +59,11 @@ type DriverRegister struct {
 
 func NewDriverRegister() *DriverRegister {
 	return &DriverRegister{}
+}
+
+func (dr *DriverRegister) IsPlus() bool {
+	productTest := dr.Product == "Algodão" || dr.Product == "ALGODAO"
+	scoreTest := dr.RegisterExtra.Score > 10
+
+	return productTest && scoreTest
 }

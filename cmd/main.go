@@ -17,9 +17,9 @@ import (
 	"os"
 )
 
-var start = 6
-var limit = 9
-var companyName = "DIONE GUIMARAES LARA"
+var start = 0
+var limit = 200
+var companyName = ""
 
 func connect(dsn string) (error, *mongo.Client, context.Context) {
 	var ctx context.Context
@@ -85,9 +85,9 @@ func main() {
 
 			newRegisterId, err := saveRegisterInValida(v, dbValida)
 			if err != nil {
-				color.Red.Printf("ERR Cadastro (%s | %s): %s\n", v.Document, v.CompanyExtra.Name, err)
+				color.Red.Printf("\nERROR > Cadastro (%s | %s): %s\n", v.Document, v.CompanyExtra.Name, err)
 			} else {
-				color.Green.Printf("%d: \nPortal ID %d (%s) | %s\n", i+1, v.CompanyPortalId, v.Company, v.Name)
+				color.Green.Printf("%d: \nSUCCESS > Portal ID %d (%s) | %s\n", i+1, v.CompanyPortalId, v.Company, v.Name)
 				color.Yellow.Printf("%d\n\n", newRegisterId)
 			}
 
@@ -96,7 +96,7 @@ func main() {
 			}
 		}
 
-		fmt.Printf("Plus: %d\n", plus)
+		fmt.Printf("Plus: %d\n\n----------------\n", plus)
 	}
 }
 
@@ -169,7 +169,7 @@ func saveRegisterInValida(register *ccov.DriverRegister, db *sql.DB) (int64, err
 	travel, _ := usecase.SaveTravel()
 
 	var newRegister int64
-	newRegister, err = usecase.SaveRegister(driverRegisterId, vehicles, travel)
+	newRegister, err = usecase.SaveRegister(driverRegisterId, vehicles, travel, register.IsPlus())
 	if err != nil {
 		return -1, err
 	}

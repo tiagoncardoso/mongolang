@@ -45,7 +45,7 @@ func (drr *CcovRegisterRepository) GetRegisterExternal(collectionName string, ct
 		return drivers, err
 	}
 
-	err = cur.Close(ctx)
+	_ = cur.Close(ctx)
 	if len(drivers) == 0 {
 		return drivers, mongo.ErrNoDocuments
 	}
@@ -55,10 +55,17 @@ func (drr *CcovRegisterRepository) GetRegisterExternal(collectionName string, ct
 
 func (drr *CcovRegisterRepository) GetRegister(collectionName string, ctx context.Context, companyName string) ([]*ccov.DriverRegister, error) {
 	var drivers []*ccov.DriverRegister
+	var cur *mongo.Cursor
+	var err error
 
 	collection := drr.db.Database("ccov").Collection(collectionName)
 
-	cur, err := collection.Find(ctx, bson.M{"Company": companyName})
+	if companyName != "" {
+		cur, err = collection.Find(ctx, bson.M{"Company": companyName})
+	} else {
+		cur, err = collection.Find(ctx, bson.D{{}})
+	}
+
 	if err != nil {
 		return nil, err
 	}

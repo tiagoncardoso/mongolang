@@ -97,7 +97,7 @@ func (pr *ParseRegister) SaveTravel() (int64, error) {
 	return tid, nil
 }
 
-func (pr *ParseRegister) SaveRegister(driverId int64, vehiclesID []int64, travelId int64) (int64, error) {
+func (pr *ParseRegister) SaveRegister(driverId int64, vehiclesID []int64, travelId int64, plus bool) (int64, error) {
 	r := pr.Register
 	vehiclesSize := len(vehiclesID)
 
@@ -124,7 +124,7 @@ func (pr *ParseRegister) SaveRegister(driverId int64, vehiclesID []int64, travel
 	}
 
 	reg := valida.NewRegister(driverId, vehicle, carreta1, carreta2, carreta3, travelId, r.RegisterExtra.Protocol, r.CreationTime)
-	reg.SetPlus(false)
+	reg.SetPlus(plus)
 	reg.SetRegisterValidity(r.RegisterExtra.CreationTime, r.RegisterExtra.ValidityTime, r.RegisterExtra.Score)
 	reg.SetRegisterValidation(r.RegisterExtra.Score)
 
