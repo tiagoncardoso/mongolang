@@ -63,7 +63,7 @@ func NewDriverRegister() *DriverRegister {
 
 func (dr *DriverRegister) IsPlus() bool {
 	productTest := dr.Product == "Algodão" || dr.Product == "ALGODAO"
-	scoreTest := dr.RegisterExtra.Score > 10
+	scoreTest := dr.Score > 10
 
 	return productTest && scoreTest
 }

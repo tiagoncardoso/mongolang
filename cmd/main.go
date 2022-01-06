@@ -17,8 +17,8 @@ import (
 	"os"
 )
 
-var start = 0
-var limit = 200
+var start = 220
+var limit = 222
 var companyName = ""
 
 func connect(dsn string) (error, *mongo.Client, context.Context) {

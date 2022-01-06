@@ -123,10 +123,10 @@ func (pr *ParseRegister) SaveRegister(driverId int64, vehiclesID []int64, travel
 		vehicle = vehiclesID[0]
 	}
 
-	reg := valida.NewRegister(driverId, vehicle, carreta1, carreta2, carreta3, travelId, r.RegisterExtra.Protocol, r.CreationTime)
+	reg := valida.NewRegister(driverId, vehicle, carreta1, carreta2, carreta3, travelId, r.Protocol, r.CreationTime)
 	reg.SetPlus(plus)
-	reg.SetRegisterValidity(r.RegisterExtra.CreationTime, r.RegisterExtra.ValidityTime, r.RegisterExtra.Score)
-	reg.SetRegisterValidation(r.RegisterExtra.Score)
+	reg.SetRegisterValidity(r.CreationTime, r.ValidityTime, r.Score)
+	reg.SetRegisterValidation(r.Score)
 
 	rid, err := pr.Repository.InsertRegister(reg)
 	if err != nil {
@@ -169,7 +169,7 @@ func (pr *ParseRegister) SaveDemand(registerId int64) (int64, error) {
 }
 
 func (pr *ParseRegister) buildDriverLocker() *locker_register.DriverLockerRegister {
-	reg := pr.Register.RegisterExtra
+	reg := pr.Register
 	lr := locker_register.NewDriverLockerRegister()
 	lr.SetDriverCategory(reg.DriverProfile)
 	lr.SetPersonalData(
@@ -198,7 +198,7 @@ func (pr *ParseRegister) buildVehicle(id int) (*valida.VehicleRegister, error) {
 	if id >= qdtVeiculos {
 		return nil, nil
 	}
-	lockerRegister := pr.buildVehicleLocker(id)
+	lockerRegister := pr.buildVehicleLocker(id, pr.Register.DriverProfile)
 
 	veic, _ := valida.NewVehicleRegister(
 		vs[id].Plate,
@@ -211,7 +211,7 @@ func (pr *ParseRegister) buildVehicle(id int) (*valida.VehicleRegister, error) {
 	return veic, nil
 }
 
-func (pr *ParseRegister) buildVehicleLocker(idVeic int) *locker_register.VehicleLockerRegister {
+func (pr *ParseRegister) buildVehicleLocker(idVeic int, bond string) *locker_register.VehicleLockerRegister {
 	reg := pr.Register.DeviceRegisters[idVeic]
 	lr := locker_register.NewVehicleLockerRegister()
 	lr.SetVehicleData(
@@ -225,6 +225,7 @@ func (pr *ParseRegister) buildVehicleLocker(idVeic int) *locker_register.Vehicle
 		vehicleType = "CARRETA"
 	}
 	lr.SetVehicleType(vehicleType)
+	lr.SetVehicleBond(bond)
 
 	return lr
 }

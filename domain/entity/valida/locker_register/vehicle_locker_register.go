@@ -1,5 +1,7 @@
 package locker_register
 
+import "strings"
+
 type VehicleLockerRegister struct {
 	Placa                   string  `json:"placa"`
 	Antt                    string  `json:"antt"`
@@ -25,4 +27,14 @@ func (vlr *VehicleLockerRegister) SetVehicleData(placa string, antt string, uf s
 
 func (vlr *VehicleLockerRegister) SetVehicleType(Vehicletype string) {
 	vlr.TipoVeiculo = Vehicletype
+}
+
+func (vlr *VehicleLockerRegister) SetVehicleBond(category string) {
+	if category == "RG" {
+		vlr.TipoVinculoProfissional = "AUTONOMO"
+	} else if category == "Terceiro" || category == "Autônomo" {
+		vlr.TipoVinculoProfissional = "AUTONOMO"
+	} else {
+		vlr.TipoVinculoProfissional = strings.ToUpper(category)
+	}
 }
